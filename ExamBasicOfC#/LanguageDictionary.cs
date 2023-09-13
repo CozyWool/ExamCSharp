@@ -3,31 +3,24 @@ using System.Text;
 
 namespace ExamBasicOfCSharp;
 
-public enum Language
-{
-    None,
-    Russian,
-    English,
-    German,
-    //....
-}
-
 public class LanguageDictionary
 {
     [JsonProperty("Dictionary")]
     private readonly List<DictionaryPart> dictionary;
-    
-    public Language FromLanguage { get; }
-    public Language ToLanguage { get; }
+
+    public LanguageTypes FromLanguage { get; }
+    public LanguageTypes ToLanguage { get; }
 
     public List<DictionaryPart> GetDictionary() => dictionary;
 
-    public LanguageDictionary(List<DictionaryPart>? dictionary, Language fromLanguage, Language toLanguage)
+    public LanguageDictionary(List<DictionaryPart>? dictionary, LanguageTypes fromLanguage, LanguageTypes toLanguage)
     {
         FromLanguage = fromLanguage;
         ToLanguage = toLanguage;
         this.dictionary = dictionary ?? new List<DictionaryPart>();
     }
+    public LanguageDictionary(LanguageTypes fromLanguage, LanguageTypes toLanguage) : this(null, fromLanguage, toLanguage) { }
+    public LanguageDictionary() : this(null, LanguageTypes.None, LanguageTypes.None) { }
 
     public void AddWord(DictionaryPart value)
     {
@@ -65,14 +58,19 @@ public class LanguageDictionary
         result = dictionary.Find(dictPart => dictPart.Word == word);
         return result != null;
     }
+    public bool FindWordsByTranslation(string translation, out DictionaryPart result)
+    {
+        result = dictionary.Find(dictPart => dictPart.Translation.Contains(translation));
+        return result != null;
+    }
     public void ReplaceWord(string oldWord, string newWord)
     {
-        if(FindWord(oldWord, out DictionaryPart dictPart))
+        if (FindWord(oldWord, out DictionaryPart dictPart))
             dictPart.Word = newWord;
     }
-    public void ReplaceTranslation(string word, string oldTranslation, string newTranslation)
+    public void ReplaceTranslation(string oldTranslation, string newTranslation)
     {
-        foreach (DictionaryPart dictPart in dictionary.Where(dictPart => dictPart.Word == word))
+        foreach (DictionaryPart dictPart in dictionary.Where(result => FindWordsByTranslation(oldTranslation, out result)))
         {
             for (int i = 0; i < dictPart.Translation.Count; i++)
             {

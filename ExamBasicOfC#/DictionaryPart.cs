@@ -6,17 +6,17 @@ public class DictionaryPart
 {
     public string Word { get; set; }
     public List<string> Translation { get; set; }
-    public Language FromLanguage { get; }
-    public Language ToLanguage { get; }
+    public LanguageTypes FromLanguage { get; }
+    public LanguageTypes ToLanguage { get; }
 
-    public DictionaryPart(string word, List<string> translation, Language fromLanguage, Language toLanguage)
+    public DictionaryPart(string word, List<string> translation, LanguageTypes fromLanguage, LanguageTypes toLanguage)
     {
         FromLanguage = fromLanguage;
         ToLanguage = toLanguage;
         Word = word;
         Translation = translation;
     }
-    public DictionaryPart() : this("", new(), Language.None, Language.None) { }
+    public DictionaryPart() : this("", new(), LanguageTypes.None, LanguageTypes.None) { }
     public void AddTranslation(string translation) => Translation.Add(translation);
     public void AddTranslation(List<string> translation) => Translation.AddRange(translation);
     public void RemoveTranslation(string translation)

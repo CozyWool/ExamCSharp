@@ -60,11 +60,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\CodeITStep\\ExamBasicOfC#\\ExamBasicOfC#\\ExamBasicOfCSharp.csproj",
+      "projectUniqueName": "D:\\Repos\\ExamBasicOfC#\\ExamBasicOfC#\\ExamBasicOfCSharp.csproj",
       "projectName": "ExamBasicOfCSharp",
-      "projectPath": "D:\\CodeITStep\\ExamBasicOfC#\\ExamBasicOfC#\\ExamBasicOfCSharp.csproj",
+      "projectPath": "D:\\Repos\\ExamBasicOfC#\\ExamBasicOfC#\\ExamBasicOfCSharp.csproj",
       "packagesPath": "C:\\Users\\vserg\\.nuget\\packages\\",
-      "outputPath": "D:\\CodeITStep\\ExamBasicOfC#\\ExamBasicOfC#\\obj\\",
+      "outputPath": "D:\\Repos\\ExamBasicOfC#\\ExamBasicOfC#\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\vserg\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -114,7 +114,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }

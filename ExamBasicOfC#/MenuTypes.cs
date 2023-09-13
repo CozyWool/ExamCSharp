@@ -9,9 +9,10 @@ public enum MenuTypes
     Replace,
     Find,
     Save,
+    Load,
     Delete,
     ExportWord,
-    
+    Show
 }
 
 public static class MenuTypesHelper
