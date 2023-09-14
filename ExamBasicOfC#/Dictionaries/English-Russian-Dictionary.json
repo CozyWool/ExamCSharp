@@ -1,0 +1,24 @@
+{
+  "Dictionary": [
+    {
+      "Word": "Hello",
+      "Translation": [
+        "Привет",
+        "Здравствуйте"
+      ],
+      "MainLanguage": "English",
+      "TranslationLanguage": "Russian"
+    },
+    {
+      "Word": "Goodbye",
+      "Translation": [
+        "Пока",
+        "До свидания"
+      ],
+      "MainLanguage": "English",
+      "TranslationLanguage": "Russian"
+    }
+  ],
+  "MainLanguage": "English",
+  "TranslationLanguage": "Russian"
+}

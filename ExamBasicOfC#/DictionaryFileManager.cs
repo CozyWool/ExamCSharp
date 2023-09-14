@@ -11,18 +11,18 @@ public class DictionaryFileManager
     public DictionaryFileManager(string directoryPath)
     {
         DirectoryPath = directoryPath;
-        Directory.CreateDirectory("Dictionaries");
+        Directory.CreateDirectory(directoryPath);
         if (Directory.Exists(DirectoryPath))
         {
             DirectoryInfo info = new(DirectoryPath);
             Files = info.GetFiles().Where(file => file.Name.EndsWith(".json")).ToList();
         }
     }
-    public DictionaryFileManager() : this("Dictionaries") { }
+    public DictionaryFileManager() : this(@"..\..\..\Dictionaries") { }
 
     public bool SaveDictionary(LanguageDictionary langDict, out string savePath)
     {
-        savePath = $"Dictionaries/{langDict.FromLanguage}-{langDict.ToLanguage}-Dictionary.json";
+        savePath = $"{DirectoryPath}/{langDict.FromLanguage}-{langDict.ToLanguage}-Dictionary.json";
         FileInfo fileInfo = new(savePath);
         if (fileInfo.Exists)
         {
@@ -37,10 +37,7 @@ public class DictionaryFileManager
     }
     public LanguageDictionary Load(int IndexOfFile) 
     {
-        // TODO: Адаптировать под список словарей(чтобы было чтение из разных файлов)
-        string Path = "";
-        
-        using var sr = new StreamReader(DirectoryPath);
+        using var sr = new StreamReader(Path.Combine(DirectoryPath, Files[IndexOfFile].Name));
         var json = sr.ReadToEnd();
         var deserialized = JsonConvert.DeserializeObject<LanguageDictionary>(json);
         return deserialized;

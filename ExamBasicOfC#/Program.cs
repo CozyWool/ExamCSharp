@@ -1,33 +1,4 @@
 ﻿using ExamBasicOfCSharp;
-using System.Xml.Linq;
-
-//var langDict = new LanguageDictionary(new()
-//{
-//    new("Hello", new(){"Привет","Здравствуйте"},Language.English,Language.Russian),
-//}, Language.English, Language.Russian);
-//Console.WriteLine(langDict.ToString());
-
-//langDict.AddWord(new("Bye", new() { "Пока", "До свидания" }, Language.English, Language.Russian));
-//Console.WriteLine(langDict.ToString());
-
-////langDict.ReplaceTranslation("Hello", "Привет", "Здарова");
-////Console.WriteLine(langDict.ToString());
-
-//langDict.ReplaceWord("Bye", "Goodbye");
-//Console.WriteLine(langDict.ToString());
-
-//langDict.RemoveTranslation("Hello", "Здарова");
-//Console.WriteLine(langDict.ToString());
-
-////langDict.RemoveWord("Goodbye");
-////Console.WriteLine(langDict.ToString());
-
-//var fileManager = new DictionaryFileManager();
-//fileManager.Save(langDict);
-
-//LanguageDictionary languageDictionary = fileManager.Load();
-//Console.WriteLine("Десериализация");
-//Console.WriteLine(languageDictionary.ToString());
 
 LanguageDictionary CurrentDictionary = new();
 DictionaryFileManager dictionaryFileManager = new();
@@ -90,20 +61,20 @@ while (true)
 void Load()
 {
     Console.WriteLine("\tСписок словарей");
-    dictionaryFileManager.ShowDictionaries("Dictionaries");
+    dictionaryFileManager.ShowDictionaries(dictionaryFileManager.DirectoryPath);
     int fileCount = dictionaryFileManager.Files.Count;
-    
+
     int answer = 0;
-    while (answer < 1 && answer > fileCount)
+    while (answer < 1 || answer > fileCount)
     {
-        try 
+        try
         {
             Console.WriteLine("Ваш выбор: ");
             answer = int.Parse(Console.ReadLine());
         }
         catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
     }
-    dictionaryFileManager.Load(answer);
+    CurrentDictionary = dictionaryFileManager.Load(answer - 1);
 }
 
 void CreateDictionary()
@@ -136,9 +107,10 @@ void Replace()
 {
     Console.WriteLine("1 - Заменить слово");
     Console.WriteLine("2 - Заменить перевод");
+    Console.WriteLine("0 - Вернуться в меню");
     Console.Write("Что вы хотите заменить?:");
     int answer = 0;
-    while (answer < 1 && answer > 2)
+    while (answer < 0 && answer > 2)
     {
         try
         {
@@ -163,9 +135,11 @@ void Replace()
             string newTranslation = Console.ReadLine().Trim();
             CurrentDictionary.ReplaceTranslation(oldTranslation, newTranslation);
             break;
-
+        case 0:
+            Console.WriteLine("Возращащение в меню...");
+            return;
         default:
-            break;
+            return;
     }
 }
 void ExportWord()
@@ -188,7 +162,10 @@ void Save()
 
 void Find()
 {
-    throw new NotImplementedException();
+    Console.Write("Введите слова для поиска его перевода(-ов): ");
+    string word = Console.ReadLine().Trim();
+    if (CurrentDictionary.FindWord(word, out var wordFound)) Console.WriteLine($"Слово найдено: {wordFound}");
+    else Console.WriteLine("Слово не найдено.");
 }
 
 
