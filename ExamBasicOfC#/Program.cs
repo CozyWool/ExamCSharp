@@ -2,6 +2,12 @@
 
 LanguageDictionary CurrentDictionary = new();
 DictionaryFileManager dictionaryFileManager = new();
+string ExportFileName = "Words";
+string ExportFileDirectoryName = @$"..\..\..\ExportedWords";
+string ExportFileDirectoryPath = $"{ExportFileDirectoryName}/{ExportFileName}.txt";
+Directory.CreateDirectory(ExportFileDirectoryName);
+
+// TODO: Добавить везде защиту от дурака
 
 while (true)
 {
@@ -60,6 +66,7 @@ while (true)
 
 void Load()
 {
+    Console.Clear();
     Console.WriteLine("\tСписок словарей");
     dictionaryFileManager.ShowDictionaries(dictionaryFileManager.DirectoryPath);
     int fileCount = dictionaryFileManager.Files.Count;
@@ -75,6 +82,9 @@ void Load()
         catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
     }
     CurrentDictionary = dictionaryFileManager.Load(answer - 1);
+    Console.Clear();
+    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
+
 }
 
 void CreateDictionary()
@@ -144,7 +154,33 @@ void Replace()
 }
 void ExportWord()
 {
-    throw new NotImplementedException();
+    Console.Write("Введите слово, которое хотите сохранить:");
+    string word = Console.ReadLine().Trim();
+    if (!CurrentDictionary.FindWord(word, out DictionaryPart result))
+    {
+        Console.WriteLine("Слово не найдено, возврат в главное меню.");
+        return;
+    }
+
+    // Не уверен добавлять ли эту возможность
+    //Console.Write($"Введите название папки, в которую нужно сохранить слово(0, если сохранить в {ExportFileDirectoryName}):");
+    //var ans = Console.ReadLine().Trim();
+    //if(ans != "0") 
+    //    ExportFileDirectoryName = @$"..\..\..\{ans}";
+
+    Console.Write($"Введите название файла, в который нужный сохранить слово(0, если сохранить в {ExportFileName}):");
+    var ans = Console.ReadLine().Trim();
+    if (ans != "0") 
+        ExportFileName = ans;
+    ExportFileDirectoryPath = $"{ExportFileDirectoryName}/{ExportFileName}.txt";
+    Directory.CreateDirectory(ExportFileDirectoryName);
+    if (!Directory.Exists(ExportFileDirectoryName))
+    {
+        Console.WriteLine("Не удалось создать папку для сохранения файла...");
+    }
+    using StreamWriter sw = new(ExportFileDirectoryPath, true); // Надо было в XML или в TXT?
+    sw.WriteLine(result.ToString());
+    Console.WriteLine("Слово записано.");
 }
 
 void Delete()

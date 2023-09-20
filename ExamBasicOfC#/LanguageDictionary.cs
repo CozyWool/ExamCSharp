@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace ExamBasicOfCSharp;
 
@@ -9,13 +8,12 @@ public class LanguageDictionary
     [JsonProperty("Dictionary")]
     private readonly List<DictionaryPart> dictionary;
 
-    [JsonInclude]
     public LanguageTypes FromLanguage { get; }
-    [JsonInclude]
     public LanguageTypes ToLanguage { get; }
 
     public List<DictionaryPart> GetDictionary() => dictionary;
 
+    [JsonConstructor]
     public LanguageDictionary(List<DictionaryPart>? dictionary, LanguageTypes fromLanguage, LanguageTypes toLanguage)
     {
         FromLanguage = fromLanguage;

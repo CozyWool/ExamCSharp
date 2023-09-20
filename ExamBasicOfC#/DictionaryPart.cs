@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Newtonsoft.Json;
+using System.Text;
 
 namespace ExamBasicOfCSharp;
 
@@ -9,6 +10,7 @@ public class DictionaryPart
     public LanguageTypes FromLanguage { get; }
     public LanguageTypes ToLanguage { get; }
 
+    [JsonConstructor]
     public DictionaryPart(string word, List<string> translation, LanguageTypes fromLanguage, LanguageTypes toLanguage)
     {
         FromLanguage = fromLanguage;

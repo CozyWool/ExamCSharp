@@ -39,7 +39,7 @@ public class DictionaryFileManager
     {
         using var sr = new StreamReader(Path.Combine(DirectoryPath, Files[IndexOfFile].Name));
         var json = sr.ReadToEnd();
-        var deserialized = JsonConvert.DeserializeObject<LanguageDictionary>(json);
+        var deserialized = JsonConvert.DeserializeObject<LanguageDictionary>(json, new StringEnumConverter());
         return deserialized;
     }
     
