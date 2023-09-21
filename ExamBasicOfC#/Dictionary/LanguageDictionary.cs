@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using ExamBasicOfCSharp.Enums;
+using Newtonsoft.Json;
 using System.Text;
+using System.Transactions;
 
-namespace ExamBasicOfCSharp;
+namespace ExamBasicOfCSharp.Dictionary;
 
 public class LanguageDictionary
 {
@@ -14,7 +16,7 @@ public class LanguageDictionary
     public List<DictionaryPart> GetDictionary() => dictionary;
 
     [JsonConstructor]
-    public LanguageDictionary(List<DictionaryPart>? dictionary, LanguageTypes fromLanguage, LanguageTypes toLanguage)
+    public LanguageDictionary(List<DictionaryPart> dictionary, LanguageTypes fromLanguage, LanguageTypes toLanguage)
     {
         FromLanguage = fromLanguage;
         ToLanguage = toLanguage;
@@ -34,19 +36,13 @@ public class LanguageDictionary
         else
             dictionary.Add(value);
     }
+
     public void RemoveWord(string word)
     {
         if (FindWord(word, out DictionaryPart dictPart) && dictionary.Remove(dictPart))
             return;
         else
             throw new Exception($"Ошибка в удалении слова {word}!");
-    }
-    public void RemoveTranslation(string word, string translation)
-    {
-        if (FindWord(word, out DictionaryPart dictPart))
-            dictPart.RemoveTranslation(translation);
-        else
-            throw new Exception($"Ошибка в удалении перевода {translation} в слове {word}!");
     }
 
     /// <summary>
@@ -59,9 +55,9 @@ public class LanguageDictionary
         result = dictionary.Find(dictPart => dictPart.Word == word);
         return result != null;
     }
-    public bool FindWordsByTranslation(string translation, out DictionaryPart result)
+    public bool FindWordsByTranslation(string translation, out List<DictionaryPart> result)
     {
-        result = dictionary.Find(dictPart => dictPart.Translation.Contains(translation));
+        result = dictionary.Where(dictPart => dictPart.Translation.Contains(translation)).ToList();
         return result != null;
     }
     public void ReplaceWord(string oldWord, string newWord)
@@ -69,9 +65,18 @@ public class LanguageDictionary
         if (FindWord(oldWord, out DictionaryPart dictPart))
             dictPart.Word = newWord;
     }
+    public bool DeleteWord(string word)
+    {
+        if (FindWord(word, out DictionaryPart dictPart))
+        {
+            return dictionary.Remove(dictPart);
+        }
+        return false;
+    }
     public void ReplaceTranslation(string oldTranslation, string newTranslation)
     {
-        foreach (DictionaryPart dictPart in dictionary.Where(result => FindWordsByTranslation(oldTranslation, out result)))
+        FindWordsByTranslation(oldTranslation, out var resultList);
+        foreach (DictionaryPart dictPart in dictionary.Where(result => resultList.Contains(result)))
         {
             for (int i = 0; i < dictPart.Translation.Count; i++)
             {
@@ -79,6 +84,34 @@ public class LanguageDictionary
                     dictPart.Translation[i] = newTranslation;
             }
         }
+    }
+    public void RemoveTranslation(string translation)
+    {
+        if (FindWordsByTranslation(translation, out var wordsList))
+        {
+            foreach (var word in wordsList)
+            {
+                word.RemoveTranslation(translation);
+            }
+        }
+        else
+            throw new Exception($"Ошибка в удалении перевода {translation}!");
+    }
+
+
+    public void RemoveTranslation(string word, string translation)
+    {
+        if (FindWord(word, out DictionaryPart dictPart))
+            dictPart.RemoveTranslation(translation);
+        else
+            throw new Exception($"Ошибка в удалении перевода {translation} в слове {word}!");
+    }
+    public void AddTranslation(string word, string translation)
+    {
+        if (FindWord(word, out DictionaryPart dictPart))
+            dictPart.AddTranslation(translation);
+        else
+            throw new Exception($"Ошибка в добавлении перевода {translation} в слове {word}!");
     }
     public List<string> this[string word]
     {
@@ -89,7 +122,7 @@ public class LanguageDictionary
                              .ToList();
         }
     }
-    public override string? ToString()
+    public override string ToString()
     {
         StringBuilder sb = new($"\n\t{FromLanguage}-{ToLanguage} словарь\n");
         foreach (var dictionaryPart in dictionary)

@@ -6,8 +6,8 @@
         "Привет",
         "Здравствуйте"
       ],
-      "MainLanguage": "English",
-      "TranslationLanguage": "Russian"
+      "FromLanguage": "English",
+      "ToLanguage": "Russian"
     },
     {
       "Word": "Goodbye",
@@ -15,10 +15,10 @@
         "Пока",
         "До свидания"
       ],
-      "MainLanguage": "English",
-      "TranslationLanguage": "Russian"
+      "FromLanguage": "English",
+      "ToLanguage": "None"
     }
   ],
-  "MainLanguage": "English",
-  "TranslationLanguage": "Russian"
+  "FromLanguage": "English",
+  "ToLanguage": "Russian"
 }

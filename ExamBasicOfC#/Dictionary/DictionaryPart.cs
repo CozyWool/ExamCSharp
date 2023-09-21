@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using ExamBasicOfCSharp.Enums;
+using Newtonsoft.Json;
 using System.Text;
 
-namespace ExamBasicOfCSharp;
+namespace ExamBasicOfCSharp.Dictionary;
 
 public class DictionaryPart
 {
@@ -33,7 +34,7 @@ public class DictionaryPart
                 Translation.Remove(translationItem);
     }
 
-    public override string? ToString()
+    public override string ToString()
     {
         StringBuilder sb = new($"{Word}: ");
         sb.Append(string.Join(", ", Translation));

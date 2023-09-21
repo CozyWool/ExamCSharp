@@ -1,4 +1,4 @@
-﻿namespace ExamBasicOfCSharp;
+﻿namespace ExamBasicOfCSharp.Enums;
 
 public enum MenuTypes
 {
@@ -6,11 +6,12 @@ public enum MenuTypes
     Exit,
     CreateDictionary,
     Add,
+    Delete,
     Replace,
     Find,
     Save,
     Load,
-    Delete,
+    DeleteDictionary,
     ExportWord,
     Show
 }

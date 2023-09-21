@@ -1,6 +1,7 @@
-﻿using ExamBasicOfCSharp;
+﻿using ExamBasicOfCSharp.Dictionary;
+using ExamBasicOfCSharp.Enums;
 
-LanguageDictionary CurrentDictionary = new();
+LanguageDictionary CurrentDictionary = null;
 DictionaryFileManager dictionaryFileManager = new();
 string ExportFileName = "Words";
 string ExportFileDirectoryName = @$"..\..\..\ExportedWords";
@@ -8,24 +9,28 @@ string ExportFileDirectoryPath = $"{ExportFileDirectoryName}/{ExportFileName}.tx
 Directory.CreateDirectory(ExportFileDirectoryName);
 
 // TODO: Добавить везде защиту от дурака
+// TODO: Добавить оповещение успех/не успех работы функции
+// TODO: Убрать зависимость от регистра для удобства пользования
+
 
 while (true)
 {
     Console.WriteLine("\n\tПрограмма \"Словарь\"\n");
     Console.WriteLine("1 - Создать словарь");
     Console.WriteLine("2 - Добавить слово/перевод в словарь");
-    Console.WriteLine("3 - Заменить слово/перевод в словаре");
-    Console.WriteLine("4 - Найти слово/перевод в словаре");
-    Console.WriteLine("5 - Сохранить словарь в файл");
-    Console.WriteLine("6 - Открыть словарь из файла");
-    Console.WriteLine("7 - Удалить словарь и его файл");
-    Console.WriteLine("8 - Экспортировать слово/перевод в отдельный файл");
-    Console.WriteLine("9 - Посмотреть текущий словарь");
+    Console.WriteLine("3 - Удалить слово/перевод в словаре");
+    Console.WriteLine("4 - Заменить слово/перевод в словаре");
+    Console.WriteLine("5 - Найти слово/перевод в словаре");
+    Console.WriteLine("6 - Сохранить словарь в файл");
+    Console.WriteLine("7 - Открыть словарь из файла");
+    Console.WriteLine("8 - Удалить словарь и его файл");
+    Console.WriteLine("9 - Экспортировать слово/перевод в отдельный файл");
+    Console.WriteLine("10 - Посмотреть текущий словарь");
     Console.WriteLine("0 - Выйти");
     Console.Write("\nВведите ответ: ");
     var t = MenuTypesHelper.Parse(Console.ReadLine());
-    Console.Clear();
-    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
+
+    PrintDict(CurrentDictionary);
 
     switch (t)
     {
@@ -33,29 +38,38 @@ while (true)
             CreateDictionary();
             break;
         case MenuTypes.Add:
+            if (NullTest(CurrentDictionary)) break;
             Add();
             break;
+        case MenuTypes.Delete:
+            if (NullTest(CurrentDictionary)) break;
+            Delete();
+            break;
         case MenuTypes.Replace:
+            if (NullTest(CurrentDictionary)) break;
             Replace();
             break;
         case MenuTypes.Find:
+            if (NullTest(CurrentDictionary)) break;
             Find();
             break;
         case MenuTypes.Save:
+            if (NullTest(CurrentDictionary)) break;
             Save();
             break;
         case MenuTypes.Load:
             Load();
             break;
-        case MenuTypes.Delete:
-            Delete();
+        case MenuTypes.DeleteDictionary:
+            DeleteDictionary();
             break;
         case MenuTypes.ExportWord:
+            if (NullTest(CurrentDictionary)) break;
             ExportWord();
             break;
         case MenuTypes.Exit:
             StopProgram();
-            break;
+            return;
         case MenuTypes.Show:
             // оно и так показывается
             break;
@@ -68,7 +82,7 @@ void Load()
 {
     Console.Clear();
     Console.WriteLine("\tСписок словарей");
-    dictionaryFileManager.ShowDictionaries(dictionaryFileManager.DirectoryPath);
+    dictionaryFileManager.ShowDictionaries();
     int fileCount = dictionaryFileManager.Files.Count;
 
     int answer = 0;
@@ -76,15 +90,17 @@ void Load()
     {
         try
         {
-            Console.WriteLine("Ваш выбор: ");
+            Console.WriteLine("Ваш выбор(0 - для возврата в меню): ");
             answer = int.Parse(Console.ReadLine());
+            if (answer == 0)
+            {
+                return;
+            }
         }
         catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
     }
     CurrentDictionary = dictionaryFileManager.Load(answer - 1);
-    Console.Clear();
-    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
-
+    PrintDict(CurrentDictionary);
 }
 
 void CreateDictionary()
@@ -96,9 +112,9 @@ void CreateDictionary()
         string type = typesArray[i];
         Console.WriteLine($"{i} - {type}");
     }
-    Console.Write("Введите с какого языка вы хотите переводить): ");
+    Console.Write("Введите с какого языка вы хотите переводить: ");
     LanguageTypes fromLanguage = Enum.Parse<LanguageTypes>(Console.ReadLine());
-    Console.Write("Введите на какой языка вы хотите переводить): ");
+    Console.Write("Введите на какой языка вы хотите переводить: ");
     LanguageTypes toLanguage = Enum.Parse<LanguageTypes>(Console.ReadLine());
     CurrentDictionary = new LanguageDictionary(fromLanguage, toLanguage);
     Console.WriteLine($"\tСловарь создан {CurrentDictionary}");
@@ -107,20 +123,103 @@ void CreateDictionary()
 }
 void Add()
 {
-    Console.Write($"Введите слово на {CurrentDictionary.FromLanguage}: ");
-    string word = Console.ReadLine();
-    Console.Write($"Введите перевод(-ы) на {CurrentDictionary.ToLanguage} через ПРОБЕЛ: ");
-    List<string> translation = Console.ReadLine().Split().ToList();
-    CurrentDictionary.AddWord(new DictionaryPart(word, translation, CurrentDictionary.FromLanguage, CurrentDictionary.ToLanguage));
+    Console.WriteLine("Что вы хотите удалить?");
+    Console.WriteLine("1 - Добавить слово");
+    Console.WriteLine("2 - Добавить перевод");
+    Console.WriteLine("0 - Вернуться в меню");
+    int answer = -1;
+    while (answer < 0 || answer > 2)
+    {
+        try
+        {
+            Console.Write("Ваш выбор: ");
+            answer = int.Parse(Console.ReadLine());
+        }
+        catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
+    }
+    string word;
+    switch (answer)
+    {
+        case 1:
+            Console.Write($"Введите слово на {CurrentDictionary.FromLanguage}: ");
+            word = Console.ReadLine().Trim();
+            Console.Write($"Введите перевод(-ы) на {CurrentDictionary.ToLanguage} через ПРОБЕЛ: ");
+            List<string> translation = Console.ReadLine().Split().ToList();
+            CurrentDictionary.AddWord(new DictionaryPart(word, translation, CurrentDictionary.FromLanguage, CurrentDictionary.ToLanguage));
+            break;
+        case 2:
+            try
+            {
+                Console.Write($"Введите слово, которому нужно добавить перевод: ");
+                word = Console.ReadLine().Trim();
+                Console.Write($"Введите перевод слова: ");
+                string translationWord = Console.ReadLine().Trim();
+                CurrentDictionary.AddTranslation(word, translationWord);
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            break;
+        case 0:
+            Console.WriteLine("Возращащение в меню...");
+            return;
+        default:
+            return;
+    }
+    Console.Clear();
+    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
+}
+
+void Delete()
+{
+    Console.WriteLine("Что вы хотите удалить?");
+    Console.WriteLine("1 - Удалить слово");
+    Console.WriteLine("2 - Удалить перевод");
+    Console.WriteLine("0 - Вернуться в меню");
+    int answer = -1;
+    while (answer < 0 || answer > 2)
+    {
+        try
+        {
+            Console.Write("Ваш выбор: ");
+            answer = int.Parse(Console.ReadLine());
+        }
+        catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
+    }
+    string word;
+    switch (answer)
+    {
+        case 1:
+            Console.Write("Введите слово, которое нужно удалить: ");
+            word = Console.ReadLine().Trim();
+            CurrentDictionary.DeleteWord(word);
+            break;
+        case 2:
+            try
+            {
+                Console.Write($"Введите слово, которому нужно удалить перевод: ");
+                word = Console.ReadLine().Trim();
+                Console.Write($"Введите перевод слова, которое нужно удалить: ");
+                string translation = Console.ReadLine().Trim();
+                CurrentDictionary.RemoveTranslation(word,translation);
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            break;
+        case 0:
+            Console.WriteLine("Возращащение в меню...");
+            return;
+        default:
+            return;
+    }
+    Console.Clear();
+    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
 }
 void Replace()
 {
+    Console.WriteLine("Что вы хотите заменить?");
     Console.WriteLine("1 - Заменить слово");
     Console.WriteLine("2 - Заменить перевод");
     Console.WriteLine("0 - Вернуться в меню");
-    Console.Write("Что вы хотите заменить?:");
-    int answer = 0;
-    while (answer < 0 && answer > 2)
+    int answer = -1;
+    while (answer < 0 || answer > 2)
     {
         try
         {
@@ -151,6 +250,8 @@ void Replace()
         default:
             return;
     }
+    Console.Clear();
+    Console.WriteLine($"\tТекущий словарь: {CurrentDictionary}\n");
 }
 void ExportWord()
 {
@@ -170,7 +271,7 @@ void ExportWord()
 
     Console.Write($"Введите название файла, в который нужный сохранить слово(0, если сохранить в {ExportFileName}):");
     var ans = Console.ReadLine().Trim();
-    if (ans != "0") 
+    if (ans != "0")
         ExportFileName = ans;
     ExportFileDirectoryPath = $"{ExportFileDirectoryName}/{ExportFileName}.txt";
     Directory.CreateDirectory(ExportFileDirectoryName);
@@ -183,9 +284,27 @@ void ExportWord()
     Console.WriteLine("Слово записано.");
 }
 
-void Delete()
+
+void DeleteDictionary()
 {
-    throw new NotImplementedException();
+    Console.Clear();
+    Console.WriteLine("\tСписок словарей");
+    dictionaryFileManager.ShowDictionaries();
+    int fileCount = dictionaryFileManager.Files.Count;
+
+    int answer = 0;
+    while (answer < 1 || answer > fileCount)
+    {
+        try
+        {
+            Console.WriteLine("Ваш выбор: ");
+            answer = int.Parse(Console.ReadLine());
+        }
+        catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
+    }
+    if (!dictionaryFileManager.Delete(answer - 1))
+        Console.WriteLine("Произошла ошибка при удалении, возврат в главное меню.");
+    PrintDict(CurrentDictionary);
 }
 
 void Save()
@@ -198,18 +317,72 @@ void Save()
 
 void Find()
 {
-    Console.Write("Введите слова для поиска его перевода(-ов): ");
-    string word = Console.ReadLine().Trim();
-    if (CurrentDictionary.FindWord(word, out var wordFound)) Console.WriteLine($"Слово найдено: {wordFound}");
-    else Console.WriteLine("Слово не найдено.");
+    Console.WriteLine("Что вы хотите удалить?");
+    Console.WriteLine("1 - Найти слово");
+    Console.WriteLine("2 - Найти перевод(-ы)");
+    Console.WriteLine("0 - Вернуться в меню");
+    int answer = -1;
+    while (answer < 0 || answer > 2)
+    {
+        try
+        {
+            Console.Write("Ваш выбор: ");
+            answer = int.Parse(Console.ReadLine());
+        }
+        catch { Console.WriteLine("Произошла ошибка при вводе, попробуйте еще раз."); }
+    }
+    switch (answer)
+    {
+        case 1:
+            Console.Write("Введите перевод для поиска слов(-а): ");
+            string translation = Console.ReadLine().Trim();
+            CurrentDictionary.FindWordsByTranslation(translation, out var result);
+            Console.WriteLine();
+            foreach (var dictPart in result)
+            {
+                Console.WriteLine($"Слово найдено: {dictPart}");
+            }
+            break;
+        case 2:
+            Console.Write("Введите слово для поиска его перевода(-ов): ");
+            string word = Console.ReadLine().Trim();
+            Console.WriteLine();
+            if (CurrentDictionary.FindWord(word, out var wordFound)) Console.WriteLine($"Слово найдено: {wordFound}");
+            else Console.WriteLine("Слово не найдено.");
+            break;
+        case 0:
+            Console.WriteLine("Возращащение в меню...");
+            return;
+        default:
+            return;
+    }
 }
-
-
-
 
 void StopProgram()
 {
     Console.Clear();
+    if (CurrentDictionary != null)
+    {
+        PrintDict(CurrentDictionary);
+        Console.Write("Сохранить перед выходом?(Y/N): ");
+        if (Console.ReadLine().ToUpper() == "Y") Save();
+    }
     Console.WriteLine("\n\t\tДо свидания!\n");
     Console.ReadKey();
+}
+
+void PrintDict(LanguageDictionary CurrentDictionary)
+{
+    Console.Clear();
+    Console.WriteLine($"\tТекущий словарь: {(CurrentDictionary == null ? "Не выбран" : CurrentDictionary.ToString())}\n");
+}
+
+bool NullTest(LanguageDictionary CurrentDictionary)
+{
+    if (CurrentDictionary == null)
+    {
+        Console.WriteLine("Словарь не выбран! Для работы со словарем необходимо выбрать его.");
+        return true;
+    }
+    return false;
 }

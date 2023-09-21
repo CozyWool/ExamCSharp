@@ -3,7 +3,7 @@
     {
       "Word": "привет",
       "Translation": [
-        "hi",
+        "what's up",
         "hello"
       ],
       "FromLanguage": "Russian",
@@ -13,7 +13,25 @@
       "Word": "здарова",
       "Translation": [
         "hey",
-        "hi"
+        "what's up"
+      ],
+      "FromLanguage": "Russian",
+      "ToLanguage": "English"
+    },
+    {
+      "Word": "пока",
+      "Translation": [
+        "bye",
+        "goodbye",
+        "bye-bye"
+      ],
+      "FromLanguage": "Russian",
+      "ToLanguage": "English"
+    },
+    {
+      "Word": "человек",
+      "Translation": [
+        "human"
       ],
       "FromLanguage": "Russian",
       "ToLanguage": "English"
