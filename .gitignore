@@ -230,3 +230,5 @@ _ReSharper*/
 packages/
 .idea
 *.rar
+.vs
+x64
